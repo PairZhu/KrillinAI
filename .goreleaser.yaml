@@ -8,11 +8,14 @@ builds:
       - linux
       - windows
 
+env:
+  - IMAGE_NAME: "{{ tolower .Env.GITHUB_REPOSITORY_OWNER }}/{{lower .ProjectName}}"
+
 # 添加 Docker 构建配置
 dockers:
   - image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER | toLower }}/{{.ProjectName | toLower}}:{{.Version}}"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER | toLower }}/{{.ProjectName | toLower}}:latest"
+      - "ghcr.io/{{ .Env.IMAGE_NAME }}:{{.Version}}"
+      - "ghcr.io/{{ .Env.IMAGE_NAME }}:latest"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
