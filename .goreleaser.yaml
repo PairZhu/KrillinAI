@@ -8,6 +8,24 @@ builds:
       - linux
       - windows
 
+env:
+  - IMAGE_NAME: "{{ tolower .Env.GITHUB_REPOSITORY_OWNER }}/{{lower .ProjectName}}"
+
+# 添加 Docker 构建配置
+dockers:
+  - image_templates:
+      - "ghcr.io/{{ .Env.IMAGE_NAME }}:{{.Version}}"
+      - "ghcr.io/{{ .Env.IMAGE_NAME }}:latest"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64,linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{.ProjectName}}"
+
 archives:
   - format: binary
     name_template: >-
@@ -28,4 +46,5 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-
+      - "^chore:"
+      - "^ci:"
