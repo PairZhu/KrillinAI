@@ -9,7 +9,7 @@ builds:
       - windows
 
 env:
-  - IMAGE_NAME: "{{ tolower .Env.GITHUB_REPOSITORY_OWNER }}/{{lower .ProjectName}}"
+  - IMAGE_NAME: "{{ tolower .Env.GITHUB_REPOSITORY_OWNER }}/{{ tolower .ProjectName }}"
 
 # 添加 Docker 构建配置
 dockers:
