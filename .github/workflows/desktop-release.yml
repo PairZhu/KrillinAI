@@ -38,14 +38,27 @@ jobs:
                   repo: context.repo.repo,
                   ref: `tags/${context.payload.inputs.tag}`
                 });
-                sha = ref.object.sha;
+                
+                if (ref.object.type === 'tag') {
+                  // If the tag is an annotated tag, we need to fetch the commit ID from the tag's object
+                  const { data: tagObject } = await github.rest.git.getTag({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    tag_sha: ref.object.sha
+                  });
+                  sha = tagObject.object.sha; // The sha of the commit the annotated tag points to
+                } else {
+                  sha = ref.object.sha; // Direct commit SHA for lightweight tag
+                }
+                
               } catch (error) {
-                throw new Error(`Failed to get commit SHA for tag ${context.payload.inputs.tag}`);
+                throw new Error(`Failed to get commit SHA for tag ${context.payload.inputs.tag}: ${error.message}`);
               }
             } else {
               // For workflow_run triggers, use the commit SHA from the workflow_run event
-              sha = context.payload.workflow_run.head_commit.id;
+              sha = context.payload.workflow_run.head_sha;
             }
+
             console.log(`Commit SHA: ${sha}`);
             core.setOutput('commit_sha', sha);
 
@@ -58,18 +71,8 @@ jobs:
             if (context.eventName === 'workflow_dispatch') {
               tag = context.payload.inputs.tag;
             } else {
-              // Get the tag from the commit SHA
-              const { data: refs } = await github.rest.git.listMatchingRefs({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: 'tags/'
-              });
-              const sha = '${{ steps.get_commit.outputs.sha }}';
-              const tagRef = refs.find(ref => ref.object.sha === sha);
-              if (!tagRef) {
-                throw new Error(`No tag found for commit ${sha}`);
-              }
-              tag = tagRef.ref.replace('refs/tags/', '');
+              // Get the tag from the workflow_run event
+              tag = context.payload.workflow_run.head_branch;
             }
             console.log(`Tag: ${tag}`);
             core.setOutput('tag', tag);
