@@ -11,7 +11,7 @@ permissions:
 
 env:
   BUILD_IMAGE: ghcr.io/techknowlogick/xgo:latest
-  IMAGE_CACHE_DIR: /tmp/docker-images
+  IMAGE_CACHE_DIR: /mnt/docker-images
 
 jobs:
   cache-docker:
@@ -21,7 +21,7 @@ jobs:
         id: cache-docker
         uses: actions/cache@v4
         with:
-          path: /tmp/${{ env.IMAGE_CACHE_DIR }}
+          path: ${{ env.IMAGE_CACHE_DIR }}
           key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
 
       - name: Load Docker image
