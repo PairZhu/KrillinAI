@@ -60,6 +60,10 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
       {{- end }}
 
+release:
+  extra_files:
+    - glob: "build/*"
+
 changelog:
   sort: asc
   filters:

@@ -9,14 +9,124 @@ on:
 permissions:
   contents: write
 
+env:
+  DESKTOP_MATRIX: 'darwin/amd64, darwin/arm64, windows/amd64, windows/386'
+
 jobs:
-  goreleaser:
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: darwin
+            arch: amd64
+            suffix: _amd64
+            display_os: macOS
+          - os: darwin
+            arch: arm64
+            suffix: _arm64
+            display_os: macOS
+          - os: windows          
+            arch: amd64
+            suffix: .exe
+            display_os: Windows
+          - os: windows
+            arch: 386
+            suffix: _i386.exe
+            display_os: Windows
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ needs.prepare.outputs.commit_sha }}
+            
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Check Docker cache file
+        id: check-docker-cache
+        run: |
+          if [ -f /tmp/docker-images/xgo-latest.tar ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Load cached Docker image
+        if: steps.cache-docker.outputs.cache-hit == 'true' && steps.check-docker-cache.outputs.found == 'true'
+        run: |
+          docker load < /tmp/docker-images/xgo-latest.tar
+
+      - name: Pull and cache Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true' || steps.check-docker-cache.outputs.found != 'true'
+        run: |
+          mkdir -p /tmp/docker-images
+          docker pull ghcr.io/techknowlogick/xgo:latest
+          docker save ghcr.io/techknowlogick/xgo:latest > /tmp/docker-images/xgo-latest.tar
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install XGO
+        run: |
+          go install src.techknowlogick.com/xgo@latest
+      
+      - name: Build Binary
+        run: |
+          xgo --targets=${{ matrix.os }}/${{ matrix.arch }} \
+            --out krillinai_desktop \
+            --dest build \
+            ./cmd/desktop
+
+      - name: Get Version
+        id: version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const rawTag = '${{ needs.prepare.outputs.tag }}';
+            const version = rawTag.replace(/^v/, ''); // Remove the leading 'v' if present
+            console.log(`Version: ${version}`);
+            core.setOutput('version', version);
+      
+      - name: Rename Binary
+        id: rename
+        run: |
+          binary_name="KrillinAI_Desktop_${{ steps.version.outputs.version }}_${{ matrix.display_os }}${{ matrix.suffix }}"
+          mv build/krillinai_desktop* build/$binary_name 
+          echo "binary_name=$binary_name" >> $GITHUB_OUTPUT
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.rename.outputs.binary_name }}
+          path: build/${{ steps.rename.outputs.binary_name }}
+
+  goreleaser:
+    needs: build-desktop
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: build
 
       - name: Set up Go
         uses: actions/setup-go@v5
