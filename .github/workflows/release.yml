@@ -33,6 +33,15 @@ jobs:
             display_os: Windows
     runs-on: ubuntu-latest
     steps:
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -50,12 +59,9 @@ jobs:
         run: |
           docker load < /tmp/docker-images/xgo-latest.tar
 
-      - name: Pull and cache Docker image
-        if: steps.cache-docker.outputs.cache-hit != 'true' || steps.check-docker-cache.outputs.found != 'true'
+      - name: Pull Docker image
         run: |
-          mkdir -p /tmp/docker-images
           docker pull ghcr.io/techknowlogick/xgo:latest
-          docker save ghcr.io/techknowlogick/xgo:latest > /tmp/docker-images/xgo-latest.tar
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -102,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
