@@ -62,7 +62,7 @@ jobs:
               arch="${parts[1]}"
               suffix="${parts[2]}"
               display_os="${parts[3]}"
-              log_prefix="[${os}/${arch}]"
+              log_prefix="[${os}-${arch}]"
               # 构建目标目录
               target_dir="dist/${os}_${arch}"
               mkdir -p "$target_dir"
