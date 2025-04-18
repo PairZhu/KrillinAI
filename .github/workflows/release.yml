@@ -24,6 +24,10 @@ jobs:
       - name: Install XGO
         run: |
           go install src.techknowlogick.com/xgo@latest
+      
+      - name: Pull Docker Image
+        run: |
+          docker pull ghcr.io/techknowlogick/xgo:latest
 
       - name: Get Version
         id: version
