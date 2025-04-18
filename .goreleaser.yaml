@@ -60,7 +60,8 @@ docker_manifests:
       - "{{ tolower .Env.DOCKER_USERNAME }}/{{ tolower .ProjectName }}:latest-arm64"
 
 archives:
-  - ids:
+  - id: server_binary
+    ids:
       - server
     format: binary
     name_template: >-
@@ -74,7 +75,8 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
       {{- end }}
-  - ids:
+  - id: desktop_binary
+    ids:
       - desktop
     format: binary
     name_template: >-
