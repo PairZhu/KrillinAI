@@ -22,9 +22,17 @@ jobs:
           sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
           sudo chown $USER ${{ env.IMAGE_CACHE_DIR }}
           chmod ug+rwx ${{ env.IMAGE_CACHE_DIR }}
-          
-      - name: Cache Docker image
+
+      - name: Check Cache
         id: cache-docker
+        uses: actions/cache@v4
+        with:
+          lookup-only: true
+          path: ${{ env.IMAGE_CACHE_DIR }}
+          key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
+      
+      - name: Cache Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: ${{ env.IMAGE_CACHE_DIR }}
@@ -64,30 +72,29 @@ jobs:
 
     runs-on: ubuntu-latest
     needs: cache-docker
-    if: always()
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Make directory for Docker image cache
-        run: |
-          sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
-          sudo chown $USER ${{ env.IMAGE_CACHE_DIR }}
-          chmod ug+rwx ${{ env.IMAGE_CACHE_DIR }}
+      # - name: Make directory for Docker image cache
+      #   run: |
+      #     sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
+      #     sudo chown $USER ${{ env.IMAGE_CACHE_DIR }}
+      #     chmod ug+rwx ${{ env.IMAGE_CACHE_DIR }}
 
       - name: Restore Docker image cache
         id: restore-cache
         uses: actions/cache@v4
         with:
           fail-on-cache-miss: true
-          path: ${{ env.IMAGE_CACHE_DIR }}
+          path: /tmp/${{ env.IMAGE_CACHE_DIR }}
           key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
 
       - name: Load Docker image
         if: steps.restore-cache.outputs.cache-hit == 'true'
         run: |
           echo "Docker image loaded from cache."
-          docker load -i ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
+          docker load -i /tmp/${{ env.IMAGE_CACHE_DIR }}/xgo.tar
 
       - name: Set up Go
         uses: actions/setup-go@v5
