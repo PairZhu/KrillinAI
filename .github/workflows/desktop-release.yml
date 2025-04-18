@@ -97,22 +97,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: darwin
-            arch: amd64
-            suffix: _amd64
-            display_os: macOS
-          - os: darwin
-            arch: arm64
-            suffix: _arm64
-            display_os: macOS
-          - os: windows          
-            arch: amd64
-            suffix: .exe
-            display_os: Windows
-          - os: windows
-            arch: 386
-            suffix: _i386.exe
-            display_os: Windows
+          # - os: darwin
+          #   arch: amd64
+          #   suffix: _amd64
+          #   display_os: macOS
+          # - os: darwin
+          #   arch: arm64
+          #   suffix: _arm64
+          #   display_os: macOS
+          # - os: windows          
+          #   arch: amd64
+          #   suffix: .exe
+          #   display_os: Windows
+          # - os: windows
+          #   arch: 386
+          #   suffix: _i386.exe
+          #   display_os: Windows
           - os: windows
             arch: arm64
             suffix: _arm64.exe
@@ -140,6 +140,12 @@ jobs:
           v: true
           trimpath: true
           pkg: ./cmd/desktop
+      
+      # tree递归显示目录结构
+      - name: List Files
+        run: |
+          echo "Listing files in build directory:"
+          tree .
 
       - name: Rename Binary
         run: |
