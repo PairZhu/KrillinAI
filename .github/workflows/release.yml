@@ -70,9 +70,9 @@ jobs:
 
       - name: Restore Docker image cache
         id: restore-cache
-        fail-on-cache-miss: true
         uses: actions/cache@v4
         with:
+          fail-on-cache-miss: true
           path: ${{ env.IMAGE_CACHE_DIR }}
           key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
 
