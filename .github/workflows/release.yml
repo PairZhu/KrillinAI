@@ -24,18 +24,12 @@ jobs:
           path: ${{ env.IMAGE_CACHE_DIR }}
           key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
 
-      - name: Load Docker image
-        if: steps.cache-docker.outputs.cache-hit == 'true'
-        run: |
-          echo "Docker image loaded from cache."
-          docker load -i ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
-
       - name: Pull Docker image
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ${{ env.IMAGE_CACHE_DIR }}
+          sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
           docker pull ${{ env.BUILD_IMAGE }}
-          docker save ${{ env.BUILD_IMAGE }} -o ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
+          sudo docker save ${{ env.BUILD_IMAGE }} -o ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
                   
 
   build-desktop:
@@ -79,7 +73,7 @@ jobs:
         if: steps.restore-cache.outputs.cache-hit == 'true'
         run: |
           echo "Docker image loaded from cache."
-          docker load -i ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
+          sudo docker load -i ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
 
       - name: Set up Go
         uses: actions/setup-go@v5
