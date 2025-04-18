@@ -17,6 +17,12 @@ jobs:
   cache-docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Make directory for Docker image cache
+        run: |
+          sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
+          sudo chown $USER ${{ env.IMAGE_CACHE_DIR }}
+          chmod ug+rwx ${{ env.IMAGE_CACHE_DIR }}
+          
       - name: Cache Docker image
         id: cache-docker
         uses: actions/cache@v4
@@ -27,10 +33,11 @@ jobs:
       - name: Pull Docker image
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
-          sudo mkdir -p ${{ env.IMAGE_CACHE_DIR }}
-          sudo chown $USER ${{ env.IMAGE_CACHE_DIR }}
-          chmod ug+rwx ${{ env.IMAGE_CACHE_DIR }}
           docker pull ${{ env.BUILD_IMAGE }}
+      
+      - name: Save Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
           docker save ${{ env.BUILD_IMAGE }} -o ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
 
   build-desktop:
