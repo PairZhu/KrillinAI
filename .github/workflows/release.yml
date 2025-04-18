@@ -71,7 +71,7 @@ jobs:
         id: restore-cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.IMAGE_CACHE_DIR }/xgo.tar
+          path: ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
           key: ${{ runner.os }}-docker-${{ env.BUILD_IMAGE }}
       
       - name: Load Docker image
@@ -79,7 +79,7 @@ jobs:
         if: steps.restore-cache.outputs.cache-hit == 'true'
         run: |
           echo "Docker image loaded from cache."
-          docker load -i ${{ env.IMAGE_CACHE_DIR }/xgo.tar
+          docker load -i ${{ env.IMAGE_CACHE_DIR }}/xgo.tar
 
       - name: Set up Go
         uses: actions/setup-go@v5
