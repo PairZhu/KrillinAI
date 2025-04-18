@@ -126,6 +126,27 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Check Docker cache file
+        id: check-docker-cache
+        run: |
+          if [ -f /tmp/docker-images/xgo-latest.tar ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Load cached Docker image
+        if: steps.cache-docker.outputs.cache-hit == 'true' && steps.check-docker-cache.outputs.found == 'true'
+        run: |
+          docker load < /tmp/docker-images/xgo-latest.tar
+
+      - name: Pull and cache Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true' || steps.check-docker-cache.outputs.found != 'true'
+        run: |
+          mkdir -p /tmp/docker-images
+          docker pull ghcr.io/techknowlogick/xgo:latest
+          docker save ghcr.io/techknowlogick/xgo:latest > /tmp/docker-images/xgo-latest.tar
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -139,11 +160,12 @@ jobs:
         run: |
           xgo --targets=${{ matrix.os }}/${{ matrix.arch }} \
             --out krillinai_desktop \
+            --dest build \
             ./cmd/desktop
 
       - name: Rename Binary
         run: |
-          mv krillinai_desktop* KrillinAI_Desktop${{ matrix.suffix }}
+          mv build/krillinai_desktop* build/KrillinAI_Desktop${{ matrix.suffix }}
 
       - name: Get Version
         id: version
@@ -154,9 +176,10 @@ jobs:
             const version = rawTag.replace(/^v/, ''); // Remove the leading 'v' if present
             console.log(`Version: ${version}`);
             core.setOutput('version', version);
-
-      - name: Upload Binary
-        uses: actions/upload-release-asset@v1
+            
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: sekwah41/upload-release-assets@v1.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
