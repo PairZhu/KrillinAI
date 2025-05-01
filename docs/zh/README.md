@@ -5,7 +5,7 @@
 
   <a href="https://trendshift.io/repositories/13360" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13360" alt="krillinai%2FKrillinAI | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
-  **[English](../README.md)｜[简体中文](../docs/README_zh.md)｜[日本語](../docs/README_jp.md)｜[한국어](../docs/README_kr.md)｜[Tiếng Việt](../docs/README_vi.md)｜[Français](../docs/README_fr.md)｜[Deutsch](../docs/README_de.md)｜[Español](../docs/README_es.md)｜[Português](../docs/README_pt.md)｜[Русский](../docs/README_rus.md)｜[اللغة العربية](../docs/README_ar.md)**
+  **[English](./README.md)｜[简体中文](./docs/zh/README.md)｜[日本語](./docs/jp/README.md)｜[한국어](./docs/kr/README.md)｜[Tiếng Việt](./docs/vi/README.md)｜[Français](./docs/fr/README.md)｜[Deutsch](./docs/de/README.md)｜[Español](./docs/es/README.md)｜[Português](./docs/pt/README.md)｜[Русский](./docs/rus/README.md)｜[اللغة العربية](./docs/ar/README.md)**
 
  [![QQ 群](https://img.shields.io/badge/QQ%20群-754069680-green?logo=tencent-qq)](https://jq.qq.com/?_wv=1027&k=754069680)
 [![Bilibili](https://img.shields.io/badge/dynamic/json?label=Bilibili&query=%24.data.follower&suffix=粉丝&url=https%3A%2F%2Fapi.bilibili.com%2Fx%2Frelation%2Fstat%3Fvmid%3D242124650&logo=bilibili&color=00A1D6&labelColor=FE7398&logoColor=FFFFFF)](https://space.bilibili.com/242124650)
@@ -73,12 +73,12 @@ https://github.com/user-attachments/assets/c2c7b528-0ef8-4ba9-b8ac-f9f92f6d4e71
 ## 🔍 语音识别服务支持
 _**下表中的本地模型全部支持自动安装可执行文件+模型文件，你只要选择，其它的KrillinAI帮你全部准备完毕。**_
 
-| 服务源         | 支持平台                     | 模型可选项              | 本地/云端 | 备注          |
-|----------------|------------------------------|-----------------------------------|-------|-------------|
-| **OpenAI Whisper** | 全平台          | -                                 | 云端    | 速度快效果好      |
-| **FasterWhisper** | Windows/Linux     | `tiny`/`medium`/`large-v2` (推荐medium+) | 本地    | 速度更快，无云服务开销 |
-| **WhisperKit**    | macOS (仅限M系列芯片)        | `large-v2`                        | 本地    | Apple芯片原生优化 |
-| **阿里云ASR**     | 全平台                       | -                                 | 云端    | 避免中国大陆网络问题  |
+| 服务源             | 支持平台              | 模型可选项                               | 本地/云端 | 备注                   |
+| ------------------ | --------------------- | ---------------------------------------- | --------- | ---------------------- |
+| **OpenAI Whisper** | 全平台                | -                                        | 云端      | 速度快效果好           |
+| **FasterWhisper**  | Windows/Linux         | `tiny`/`medium`/`large-v2` (推荐medium+) | 本地      | 速度更快，无云服务开销 |
+| **WhisperKit**     | macOS (仅限M系列芯片) | `large-v2`                               | 本地      | Apple芯片原生优化      |
+| **阿里云ASR**      | 全平台                | -                                        | 云端      | 避免中国大陆网络问题   |
 
 ## 🚀 大模型支持
 
